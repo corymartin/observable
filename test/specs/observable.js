@@ -14,7 +14,7 @@ describe('Observable Mixin', function() {
   });
 
 
-  describe('mixin setup usage', function() {
+  describe('mixin invocation', function() {
     it('should add a `on` function to the passed object', function() {
       observable(o1);
       expect(typeof o1.on).toBe('function');
@@ -33,6 +33,19 @@ describe('Observable Mixin', function() {
     it('should add a `getEvents` function to the passed object', function() {
       observable(o1);
       expect(typeof o1.getEvents).toBe('function');
+    });
+
+    it('should return the target object', function() {
+      var retval = observable(o1);
+      expect(retval).toBe(o1);
+
+      var myO = observable({
+        fred: 'flinstone'
+      });
+      expect(myO.fred).toBe('flinstone');
+      expect(typeof myO.on).toBe('function');
+      expect(typeof myO.off).toBe('function');
+      expect(typeof myO.fire).toBe('function');
     });
   });
 
@@ -198,27 +211,6 @@ describe('Observable Mixin', function() {
         x = o2.fire();
         expect(x).toBe(o2);
       });
-    });
-
-    describe('#getEvents', function() {
-      it('should return a readonly copy of the events collection', function() {
-        o2.on('event-1', cb1);
-        o2.on('event-2', cb2, cb3);
-        var evts = o2.getEvents();
-        expect(evts['event-1']).toBeDefined();
-        expect(evts['event-2']).toBeDefined();
-        delete evts['event-1'];
-        delete evts['event-2'];
-        expect(evts['event-1']).not.toBeDefined();
-        expect(evts['event-2']).not.toBeDefined();
-        evts = o2.getEvents();
-        expect(evts['event-1']).toBeDefined();
-        expect(evts['event-2']).toBeDefined();
-
-        expect(evts['event-1'][0]).toBe(cb1);
-        expect(evts['event-2'][0]).toBe(cb2);
-        expect(evts['event-2'][1]).toBe(cb3);
-      });
 
       it('should pass function arguments to the event handlers', function() {
         var names       = [];
@@ -238,6 +230,27 @@ describe('Observable Mixin', function() {
         expect(ages[1]).toBe(25);
         expect(occupations[0]).toBe('construction');
         expect(occupations[1]).toBe('surfer');
+      });
+    });
+
+    describe('#getEvents', function() {
+      it('should return a copy of the events collection', function() {
+        o2.on('event-1', cb1);
+        o2.on('event-2', cb2, cb3);
+        var evts = o2.getEvents();
+        expect(evts['event-1']).toBeDefined();
+        expect(evts['event-2']).toBeDefined();
+        delete evts['event-1'];
+        delete evts['event-2'];
+        expect(evts['event-1']).not.toBeDefined();
+        expect(evts['event-2']).not.toBeDefined();
+        evts = o2.getEvents();
+        expect(evts['event-1']).toBeDefined();
+        expect(evts['event-2']).toBeDefined();
+
+        expect(evts['event-1'][0]).toBe(cb1);
+        expect(evts['event-2'][0]).toBe(cb2);
+        expect(evts['event-2'][1]).toBe(cb3);
       });
     });
   });

@@ -2,8 +2,8 @@
 build: clean compile
 
 clean:
-	rm -fr
+	rm -f build/observable.min.js
 
 compile:
-	uglifyjs --unsafe --output observable.min.js
+	uglifyjs --unsafe --output build/observable.min.js lib/observable.js
 
