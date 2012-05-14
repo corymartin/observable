@@ -5,9 +5,11 @@ Mixin function that adds an event system to an object.
 
 
 API
----
+===
 
-### observable(obj [, config])
+
+observable(obj [, config])
+--------------------------
 
 Adds observer functions to the target object.
 
@@ -63,14 +65,15 @@ var myObj = new MyCtor;
 
 
 Observable Functions
---------------------
+====================
 
 Four functions are added to the target object:
 [on](#on), [off](#off), [fire](#fire), and [getEvents](#getEvents)
 
 
 <a id="on"></a>
-### on(eventName, callback [, callbackN])
+on(eventName, callback [, callbackN])
+-------------------------------------
 
 Binds one or more callbacks to `eventName`
 
@@ -88,7 +91,8 @@ myObj.on('widgetLoaded', function(){ /*...*/ });
 
 
 <a id="off"></a>
-### off(eventName, callback [, callbackN])
+off(eventName, callback [, callbackN])
+--------------------------------------
 
 Unbinds one or more callbacks bound to `eventName`
 
@@ -105,7 +109,8 @@ myObj.off('widgetLoaded', myCallback); // Unbinds callback `myCallback`
 ```
 
 
-### off(eventName)
+off(eventName)
+--------------
 
 Removes all callbacks for `eventName`
 
@@ -121,7 +126,8 @@ myObj.off('widgetLoaded'); // Removes event "widgetLoaded"
 ```
 
 
-### off()
+off()
+-----
 
 Removes all events.
 
@@ -134,7 +140,8 @@ myObj.off(); // myObj now has no events
 
 
 <a id="fire"></a>
-### fire(eventName [, args])
+fire(eventName [, args])
+------------------------
 
 Invokes all callbacks for `eventName`
 
@@ -155,7 +162,8 @@ myObj.fire('widgetLoaded', 'some', 'args', 4, 'you');
 
 
 <a id="getEvents"></a>
-### getEvents()
+getEvents()
+-----------
 
 Returns a copy of the events collection.
 
@@ -168,7 +176,7 @@ myObj.getEvents(); //=> { widgetLoaded: [/*functions*/], widgetError: [/*...*/] 
 
 
 Extended Examples
------------------
+=================
 
 ```js
 var widget = observable({
