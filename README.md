@@ -71,7 +71,7 @@ Four functions are added to the target object:
 [on](#on), [off](#off), [fire](#fire), and [getEvents](#getEvents)
 
 
-<a id="on"></a>
+<a name="on"></a>
 on(eventName, callback [, callbackN])
 -------------------------------------
 
@@ -90,7 +90,7 @@ myObj.on('widgetLoaded', function(){ /*...*/ });
 ```
 
 
-<a id="off"></a>
+<a name="off"></a>
 off(eventName, callback [, callbackN])
 --------------------------------------
 
@@ -139,7 +139,7 @@ myObj.off(); // myObj now has no events
 ```
 
 
-<a id="fire"></a>
+<a name="fire"></a>
 fire(eventName [, args])
 ------------------------
 
@@ -161,7 +161,7 @@ myObj.fire('widgetLoaded', 'some', 'args', 4, 'you');
 ```
 
 
-<a id="getEvents"></a>
+<a name="getEvents"></a>
 getEvents()
 -----------
 
