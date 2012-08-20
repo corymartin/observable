@@ -1,6 +1,6 @@
 {
   "name": "observable",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "author": "Cory Martin",
   "description": "Mixin function that adds an event system to an object.",
   "main": "index.js",

@@ -1,6 +1,7 @@
 /*!
  * Observable Mixin
  * ================
+ * v0.1.1
  * Adds basic observer pattern functionality to an object.
  * https://github.com/corymartin/observable
  * Copyright (c) 2012 Cory Martin
@@ -18,20 +19,31 @@
     'use strict';
 
     var _extend = function(target, source) {
-      if (source != null)
-        for (var key in source) target[key] = source[key];
+      if (source != null) {
+        for (var key in source) {
+          target[key] = source[key];
+        }
+      }
       return target;
-    }
+    };
 
-    var _each = [].forEach || function(iterator, context) {
-      var i   = 0;
-      var len = this.length;
-      for (; i < len; i++) iterator.call(context, this[i], i, this);
-    }
+    var ArrProto = Array.prototype;
 
-    var _isString = function(obj) {
-      return ({}).toString.call(obj) === '[object String]';
-    }
+    var _slice = ArrProto.slice;
+
+    var _each = ArrProto.forEach || function(iterator, context) {
+      var i = 0;
+      for (; i < this.length; i++) {
+        iterator.call(context, this[i], i, this);
+      }
+    };
+
+    var _isString = (function() {
+      var _toString = Object.prototype.toString;
+      return function(obj) {
+        return _toString.call(obj) === '[object String]';
+      };
+    })();
 
 
     /**
@@ -87,10 +99,9 @@
           }
         }
 
-        var functions = [].slice.call(arguments, 1);
+        if (arguments.length < 2) return this;
 
-        if (!functions.length) return this;
-
+        var functions = _slice.call(arguments, 1);
         var callbacks = _events[evt] || (_events[evt] = []);
 
         _each.call(functions, function(fn) {
@@ -106,8 +117,8 @@
         });
 
         return this;
-      }
-    }
+      };
+    };
 
 
     /**
@@ -165,15 +176,18 @@
 
       if (!callbacks) return this;
 
-      var args = arguments;
+      var args = arguments.length > 1
+        ? _slice.call(arguments, 1)
+        : null;
+
       _each.call(callbacks, function(cb) {
-        args.length === 1
-          ? cb.call(this)
-          : cb.apply(this, [].slice.call(args, 1));
+        args !== null
+          ? cb.apply(this, args)
+          : cb.call(this);
       }, this);
 
       return this;
-    }
+    };
 
 
     /**
@@ -182,11 +196,18 @@
 
     obj.getEvents = function() {
       return _extend({}, _events);
-    }
+    };
 
 
     return obj;
-  }
+  };
+
+
+  /**
+   * Version
+   */
+
+  observable.VERSION = '0.1.1';
 
 
   // Export
