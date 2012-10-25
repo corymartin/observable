@@ -216,14 +216,13 @@ function Widget() {
 }
 
 Widget.prototype.onShowError = function() {
-  var args = [].slice.call(arguments);
-  args.unshift('_showError');
-  this.on.apply(this, args);
+  [].unshift.call(arguments, 'widget:error');
+  this.on.apply(this, arguments);
   return this;
 }
 
 Widget.prototype.showError = function(msg) {
-  this.fire('_showError', msg);
+  this.fire('widget:error', msg);
 }
 
 /* ... */

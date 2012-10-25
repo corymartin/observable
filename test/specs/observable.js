@@ -47,6 +47,24 @@ describe('Observable Mixin', function() {
       expect(typeof myO.off).toBe('function');
       expect(typeof myO.fire).toBe('function');
     });
+
+    it('should prevent collisions between invocations', function() {
+      observable(o1);
+      observable(o2);
+      o1.on('foo', function(){ 'foo'; });
+      o1.on('bar', function(){ 'bar'; });
+      o2.on('zzz', function(){ 'zzz'; });
+
+      var events1 = o1.getEvents();
+      var events2 = o2.getEvents();
+
+      expect(events1.foo).toBeDefined();
+      expect(events1.bar).toBeDefined();
+      expect(events1.zzz).not.toBeDefined();
+      expect(events2.foo).not.toBeDefined();
+      expect(events2.bar).not.toBeDefined();
+      expect(events2.zzz).toBeDefined();
+    });
   });
 
 
