@@ -9,6 +9,35 @@
  */
 
 ;(function() {
+  'use strict';
+
+  var _extend = function(target, source) {
+    if (source != null) {
+      for (var key in source) {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  };
+
+  var ArrProto = Array.prototype;
+
+  var _slice = ArrProto.slice;
+
+  var _each = ArrProto.forEach || function(iterator, context) {
+    var i = 0;
+    for (; i < this.length; i++) {
+      iterator.call(context, this[i], i, this);
+    }
+  };
+
+  var _isString = (function() {
+    var _toString = Object.prototype.toString;
+    return function(obj) {
+      return _toString.call(obj) === '[object String]';
+    };
+  })();
+
 
   /**
    * @param {Object} Target object to receive observable functions. Passed by reference.
@@ -16,35 +45,6 @@
    */
 
   function observable(obj, config) {
-    'use strict';
-
-    var _extend = function(target, source) {
-      if (source != null) {
-        for (var key in source) {
-          target[key] = source[key];
-        }
-      }
-      return target;
-    };
-
-    var ArrProto = Array.prototype;
-
-    var _slice = ArrProto.slice;
-
-    var _each = ArrProto.forEach || function(iterator, context) {
-      var i = 0;
-      for (; i < this.length; i++) {
-        iterator.call(context, this[i], i, this);
-      }
-    };
-
-    var _isString = (function() {
-      var _toString = Object.prototype.toString;
-      return function(obj) {
-        return _toString.call(obj) === '[object String]';
-      };
-    })();
-
 
     /**
      * Configuration Options
@@ -203,11 +203,7 @@
   };
 
 
-  /**
-   * Version
-   */
-
-  observable.VERSION = '0.1.1';
+  observable.VERSION = '0.1.2';
 
 
   // Export
@@ -216,4 +212,4 @@
   else
     this.observable = observable;
 
-})();
+}).call(this);
