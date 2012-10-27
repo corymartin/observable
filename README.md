@@ -56,10 +56,9 @@ observable(myObj, {
 
 With a function constructor - each instance will have it's own events collection
 
-```js
-function MyCtor() {
-  observable(this);
-}
+```
+function MyCtor() {};
+observable(MyCtor.prototype);
 var myObj = new MyCtor;
 ```
 
@@ -73,6 +72,7 @@ Four functions are added to the target object:
 
 <a name="on"></a>
 on(eventName, callback [, callbackN])
+on(eventName, callbackArray)
 -------------------------------------
 
 Binds one or more callbacks to `eventName`
@@ -211,9 +211,9 @@ Custom event
 
 ```js
 function Widget() {
-  observable(this);
   this.name = 'widgie';
-}
+};
+observable(Widget.prototype);
 
 Widget.prototype.onShowError = function() {
   [].unshift.call(arguments, 'widget:error');

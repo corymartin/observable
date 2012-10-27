@@ -65,45 +65,42 @@ describe('Observable Mixin', function() {
       expect(events2.bar).not.toBeDefined();
       expect(events2.zzz).toBeDefined();
     });
-  });
 
+    it('should work on the `prototype` of a function constructor', function() {
+      function Ctor() {};
+      observable(Ctor.prototype);
 
-  describe('mixin options', function() {
-    it('should allow a custom name for on/bind/subscribe function', function() {
-      observable(o1, { on: 'todos' });
+      var c1 = new Ctor;
+      var c2 = new Ctor;
+      c1.on('uno', function(){});
+      c2.on('dos', function(){});
 
-      expect(typeof o1.todos).toBe('function');
-      expect(o1.on == null).toBe(true);
+      var events1 = c1.getEvents();
+      var events2 = c2.getEvents();
 
-      var foo;
-      o1.todos('doFoo', function(){ foo = 'bar'; });
-      o1.fire('doFoo');
-      expect(foo).toBe('bar');
+      expect(events1.uno).toBeDefined();
+      expect(events1.dos).not.toBeDefined();
+      expect(events2.uno).not.toBeDefined();
+      expect(events2.dos).toBeDefined();
     });
 
-    it('should allow a custom name for off/unbind/unsubscribe function', function() {
-      observable(o1, { off: 'notdo' });
+    it('should work on `this` within a function constructor', function() {
+      function Ctor() {
+        observable(this);
+      };
 
-      expect(typeof o1.notdo).toBe('function');
-      expect(o1.off == null).toBe(true);
+      var c1 = new Ctor;
+      var c2 = new Ctor;
+      c1.on('one', function(){});
+      c2.on('two', function(){});
 
-      var foo;
-      o1.on('doFoo', function(){ foo = 'bar'; });
-      o1.notdo('doFoo');
-      o1.fire('doFoo');
-      expect(foo).not.toBeDefined();
-    });
+      var events1 = c1.getEvents();
+      var events2 = c2.getEvents();
 
-    it('should allow a custom name for fire/trigger/publish function', function() {
-      observable(o1, { fire: 'doit' });
-
-      expect(typeof o1.doit).toBe('function');
-      expect(o1.fire == null).toBe(true);
-
-      var foo;
-      o1.on('doFoo', function(){ foo = 'bar'; });
-      o1.doit('doFoo');
-      expect(foo).toBe('bar');
+      expect(events1.one).toBeDefined();
+      expect(events1.two).not.toBeDefined();
+      expect(events2.one).not.toBeDefined();
+      expect(events2.two).toBeDefined();
     });
   });
 
@@ -113,13 +110,15 @@ describe('Observable Mixin', function() {
     var cb1 = function() { result.push('cb1'); }
     var cb2 = function() { result.push('cb2'); }
     var cb3 = function() { result.push('cb3'); }
+    var cb4 = function() { result.push('cb4'); }
+    var cb5 = function() { result.push('cb5'); }
 
     beforeEach(function() {
       observable(o1);
     });
 
     describe('#on', function() {
-      it('should add one or more event handlers for a specified event name', function() {
+      it('should add one or more callbacks for a specified event name', function() {
         var evts = o2.getEvents();
         expect(evts['event-1']).not.toBeDefined();
         expect(evts['event-2']).not.toBeDefined();
@@ -136,6 +135,25 @@ describe('Observable Mixin', function() {
         expect(evts['event-2'][1]).toBe(cb3);
       });
 
+      it('should add an array of callbacks for a specified event name', function() {
+        var evts = o2.getEvents();
+        expect(evts['event-1']).not.toBeDefined();
+        expect(evts['event-2']).not.toBeDefined();
+
+        o2.on('event-1', [cb1]);
+        o2.on('event-2', [cb2, cb3, cb4, cb5]);
+        evts = o2.getEvents();
+
+        expect(evts['event-1'] instanceof Array).toBe(true);
+        expect(evts['event-1'][0]).toBe(cb1);
+
+        expect(evts['event-2'] instanceof Array).toBe(true);
+        expect(evts['event-2'][0]).toBe(cb2);
+        expect(evts['event-2'][1]).toBe(cb3);
+        expect(evts['event-2'][2]).toBe(cb4);
+        expect(evts['event-2'][3]).toBe(cb5);
+      });
+
       it('should return `this`', function() {
         var x = o2.on('event-1', cb1, cb2);
         expect(x).toBe(o2);
@@ -150,36 +168,65 @@ describe('Observable Mixin', function() {
 
     describe('#off', function() {
       beforeEach(function() {
-        o2.on('event-1', cb1, cb2, cb3);
-        o2.on('event-2', cb2, cb3, cb1);
+        o2.on('event-1', cb1, cb2, cb3, cb4, cb5);
+        o2.on('event-2', cb1, cb2, cb3, cb4, cb5);
       });
 
-      it('should remove one or more event handlers for a specified event name', function() {
+      it('should remove one or more callbacks for a specified event name', function() {
         var evts = o2.getEvents();
-        expect(evts['event-1'].length).toBe(3);
+        expect(evts['event-1'].length).toBe(5);
 
         o2.off('event-1', cb1, cb3);
         evts = o2.getEvents();
-        expect(evts['event-1'].length).toBe(1);
+        expect(evts['event-1'].length).toBe(3);
         expect(evts['event-1'][0]).toBe(cb2);
-        expect(evts['event-2']).toBeDefined();
+        expect(evts['event-1'][1]).toBe(cb4);
+        expect(evts['event-1'][2]).toBe(cb5);
+
+        o2.on('event-2', cb1, cb2, cb3);
+        expect(evts['event-2'].length).toBe(8);
+        o2.off('event-2', cb5, cb1, cb3);
         expect(evts['event-2'].length).toBe(3);
+        expect(evts['event-2'][0]).toBe(cb2);
+        expect(evts['event-2'][1]).toBe(cb4);
+        expect(evts['event-2'][2]).toBe(cb2);
+      });
+
+      it('should remove an array of callbacks for a specified event name', function() {
+        var evts = o2.getEvents();
+        expect(evts['event-1'].length).toBe(5);
+
+        o2.off('event-1', [cb2, cb3, cb5]);
+        evts = o2.getEvents();
+        expect(evts['event-1'].length).toBe(2);
+        expect(evts['event-1'][0]).toBe(cb1);
+        expect(evts['event-1'][1]).toBe(cb4);
+
+        o2.on('event-2', cb1, cb2, cb3);
+        expect(evts['event-2'].length).toBe(8);
+        o2.off('event-2', [cb5, cb3, cb1]);
+        expect(evts['event-2'].length).toBe(3);
+        expect(evts['event-2'][0]).toBe(cb2);
+        expect(evts['event-2'][1]).toBe(cb4);
+        expect(evts['event-2'][2]).toBe(cb2);
       });
 
       it('should delete an event entirely if only the event name is passed', function() {
         var evts = o2.getEvents();
-        expect(evts['event-1']).toBeDefined();
+        expect(evts['event-1'].length).toBe(5);
         o2.off('event-1');
         evts = o2.getEvents();
         expect(evts['event-1']).not.toBeDefined();
         expect(evts['event-2']).toBeDefined();
-        expect(evts['event-2'].length).toBe(3);
+        expect(evts['event-2'].length).toBe(5);
       });
 
       it('should delete all events if no parameters are passed', function() {
         var evts = o2.getEvents();
         expect(evts['event-1']).toBeDefined();
+        expect(evts['event-1'].length).toBe(5);
         expect(evts['event-2']).toBeDefined();
+        expect(evts['event-2'].length).toBe(5);
 
         o2.off();
         evts = o2.getEvents();
