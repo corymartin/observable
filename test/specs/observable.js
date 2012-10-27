@@ -48,6 +48,14 @@ describe('Observable Mixin', function() {
       expect(typeof myO.fire).toBe('function');
     });
 
+    it('should create and return a new object if no object is passed', function() {
+      var o = observable();
+      expect(typeof o.on).toBe('function');
+      expect(typeof o.off).toBe('function');
+      expect(typeof o.fire).toBe('function');
+      expect(typeof o.getEvents).toBe('function');
+    });
+
     it('should prevent collisions between invocations', function() {
       observable(o1);
       observable(o2);
