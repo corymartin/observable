@@ -3,7 +3,8 @@ Observable.js
 
 Mixin function that adds observer functionality to an object.
 
-
+Download
+--------
 [Development](https://raw.github.com/corymartin/observable/master/build/observable.js)
 
 [Production](https://raw.github.com/corymartin/observable/master/build/observable.min.js)
@@ -11,11 +12,9 @@ Mixin function that adds observer functionality to an object.
 
 
 API
-===
+---
 
-
-observable( [obj] )
---------------------------
+### observable( [obj] )
 
 Adds observer functions to the target object.
 
@@ -61,23 +60,22 @@ var myobj = new Widget;
 
 
 Observable Functions
-====================
+--------------------
 
 Four functions are added to the target object:
 [on](#on), [off](#off), [fire](#fire), and [getEvents](#getEvents)
 
 
 <a name="on"></a>
-on(eventName, callback [, callbackN]) <br /> on(eventName, callbackArray)
--------------------------------------
+### on( eventName, callback [, callbackN] ) <br /> on( eventName, callbackArray )
 
 Binds one or more callbacks to `eventName`
 
 __Parameters__
 
 - __*eventName*__ `String` Event identifier.
-- __*callback*__ `Function | Array` Either one or more callback functions
-  (comma separated) to bind or an array thereof.
+- __*callback*__ `Function | Array` Either one or more callback functions to
+  bind or an array thereof.
 
 __Returns__
 `Object` The target object.
@@ -100,16 +98,15 @@ myobj.on('widgetLoaded', [init, populate]);
 
 
 <a name="off"></a>
-off(eventName, callback [, callbackN]) <br /> off(eventName, callbackArray)
---------------------------------------
+### off( eventName, callback [, callbackN] ) <br /> off( eventName, callbackArray )
 
 Removes one or more callbacks bound to `eventName`
 
 __Parameters__
 
 - __*eventName*__ `String` Event identifier.
-- __*callback*__ `Function` One or more callback function references
-  (comma separated) to unbind or an array thereof.
+- __*callback*__ `Function` One or more callback function references to unbind
+  or an array thereof.
 
 __Returns__
 `Object` The target object.
@@ -126,8 +123,7 @@ myobj.off('widgetLoaded', [init, populate]);
 ```
 
 
-off(eventName)
---------------
+### off( eventName )
 
 Removes all callbacks bound to `eventName`
 
@@ -143,8 +139,7 @@ myobj.off('widgetLoaded');
 ```
 
 
-off()
------
+### off()
 
 Removes all events.
 
@@ -157,8 +152,7 @@ myobj.off();
 
 
 <a name="fire"></a>
-fire(eventName [, args])
-------------------------
+### fire( eventName [, args] )
 
 Invokes all callbacks for `eventName`
 
@@ -179,8 +173,7 @@ myobj.fire('widgetLoaded', 'some', /args/, 4, 'you');
 
 
 <a name="getEvents"></a>
-getEvents()
------------
+### getEvents()
 
 Returns a copy of the events collection.
 
@@ -193,7 +186,7 @@ myobj.getEvents();
 
 
 Extended Examples
-=================
+-----------------
 
 ```js
 var widget = observable({
@@ -260,16 +253,16 @@ var pubsub = observable();
 var todosInputWidget = {
   /*...*/
   saveTodo : function(todoData) {
-    acme.pubsub.fire('todos:new', todoData);
+    pubsub.fire('todos:new', todoData);
   }
   /*...*/
 };
 
 var todosDisplayWidget = {
-  /*...*/
   init : function(){
-    acme.pubsub.on('todos:new', this.showTodo);
+    pubsub.on('todos:new', this.showTodo);
   },
+  /*...*/
   showTodo : function(todoData) {
     // Display new todo
   }

@@ -30,13 +30,12 @@
     }
   };
 
-  var _isArray = Array.isArray || (function() {
-    var _toString   = ({}).toString;
-    var _arrayClass = '[object Array]';
-    return function(obj) {
-      return _toString.call(obj) === _arrayClass;
-    };
-  })();
+  var _toString   = ({}).toString;
+  var _arrayClass = '[object Array]';
+
+  var _isArray = Array.isArray || function(obj) {
+    return _toString.call(obj) === _arrayClass;
+  };
 
 
   var _observable = {
@@ -46,8 +45,8 @@
      *    myObj.on( 'showErrors', function1, functionN )
      *    myObj.on( 'showErrors', [function1, functionN] )
      *
-     * @param {String} Event identifier.
-     * @param {Function|Array} N functions to bind to this event.
+     * @param {String} evt Event identifier.
+     * @param {Function|Array} callbacks N functions to bind to this event.
      * @returns {Object} Reference to `this` for chaining.
      * @api public
      */
@@ -80,8 +79,8 @@
      *    myObj.off( 'showErrors', function1, functionN )
      *    myObj.off( 'showErrors', [function1, functionN] )
      *
-     * @param {String} Optional. Event identifier.
-     * @param {Function|Array} Optional. N functions to unbind from Event identifier. If none are passed the event is deleted entirely.
+     * @param {String} evt Optional. Event identifier.
+     * @param {Function|Array} callbacks Optional. N functions to unbind from Event identifier. If none are passed the event is deleted entirely.
      * @returns {Object} Reference to `this` for chaining.
      * @api public
      */
@@ -120,8 +119,8 @@
      *    // Trigger all handlers for a specific event, with arguments.
      *    myObj.fire( 'showErrors', 'some', 'args', 4, 'you' )
      *
-     * @param {String} Event identifier.
-     * @param {Mixed} Optional. N additional arguments to be passed to the hanlders
+     * @param {String} evt Event identifier.
+     * @param {Mixed} args Optional. N additional arguments to be passed to the hanlders
      * @returns {Object} Reference to `this` for chaining.
      * @api public
      */
@@ -151,7 +150,6 @@
 
   /**
    * @param {Object} obj Target object to receive observable functions. Passed by reference.
-   * @param {Object} config Optional. Configuration object.
    * @returns {Object}
    * @api public
    */
