@@ -1,5 +1,13 @@
 describe('Observable Mixin', function() {
 
+  _.count = function(arr, value) {
+    var cnt = 0;
+    _.each(arr, function(val) {
+      if (val === value) cnt++;
+    });
+    return cnt;
+  };
+
   var o1, o2;
 
   beforeEach(function() {
@@ -132,15 +140,19 @@ describe('Observable Mixin', function() {
         expect(evts['event-2']).not.toBeDefined();
 
         o2.on('event-1', cb1);
-        o2.on('event-2', cb2, cb3);
+        o2.on('event-2', cb2, cb3, cb4, cb5);
         evts = o2.getEvents();
 
-        expect(evts['event-1'] instanceof Array).toBe(true);
-        expect(evts['event-1'][0]).toBe(cb1);
+        expect(_.isArray(evts['event-1'])).toBe(true);
+        expect(evts['event-1'].length).toBe(1);
+        expect(_.contains(evts['event-1'], cb1)).toBe(true);
 
-        expect(evts['event-2'] instanceof Array).toBe(true);
-        expect(evts['event-2'][0]).toBe(cb2);
-        expect(evts['event-2'][1]).toBe(cb3);
+        expect(_.isArray(evts['event-2'])).toBe(true);
+        expect(evts['event-2'].length).toBe(4);
+        expect(_.contains(evts['event-2'], cb2)).toBe(true);
+        expect(_.contains(evts['event-2'], cb3)).toBe(true);
+        expect(_.contains(evts['event-2'], cb4)).toBe(true);
+        expect(_.contains(evts['event-2'], cb5)).toBe(true);
       });
 
       it('should add an array of callbacks for a specified event name', function() {
@@ -152,14 +164,16 @@ describe('Observable Mixin', function() {
         o2.on('event-2', [cb2, cb3, cb4, cb5]);
         evts = o2.getEvents();
 
-        expect(evts['event-1'] instanceof Array).toBe(true);
-        expect(evts['event-1'][0]).toBe(cb1);
+        expect(_.isArray(evts['event-1'])).toBe(true);
+        expect(evts['event-1'].length).toBe(1);
+        expect(_.contains(evts['event-1'], cb1)).toBe(true);
 
-        expect(evts['event-2'] instanceof Array).toBe(true);
-        expect(evts['event-2'][0]).toBe(cb2);
-        expect(evts['event-2'][1]).toBe(cb3);
-        expect(evts['event-2'][2]).toBe(cb4);
-        expect(evts['event-2'][3]).toBe(cb5);
+        expect(_.isArray(evts['event-2'])).toBe(true);
+        expect(evts['event-2'].length).toBe(4);
+        expect(_.contains(evts['event-2'], cb2)).toBe(true);
+        expect(_.contains(evts['event-2'], cb3)).toBe(true);
+        expect(_.contains(evts['event-2'], cb4)).toBe(true);
+        expect(_.contains(evts['event-2'], cb5)).toBe(true);
       });
 
       it('should return `this`', function() {
@@ -187,17 +201,17 @@ describe('Observable Mixin', function() {
         o2.off('event-1', cb1, cb3);
         evts = o2.getEvents();
         expect(evts['event-1'].length).toBe(3);
-        expect(evts['event-1'][0]).toBe(cb2);
-        expect(evts['event-1'][1]).toBe(cb4);
-        expect(evts['event-1'][2]).toBe(cb5);
+        expect(_.contains(evts['event-1'], cb2)).toBe(true);
+        expect(_.contains(evts['event-1'], cb4)).toBe(true);
+        expect(_.contains(evts['event-1'], cb5)).toBe(true);
 
         o2.on('event-2', cb1, cb2, cb3);
         expect(evts['event-2'].length).toBe(8);
         o2.off('event-2', cb5, cb1, cb3);
         expect(evts['event-2'].length).toBe(3);
-        expect(evts['event-2'][0]).toBe(cb2);
-        expect(evts['event-2'][1]).toBe(cb4);
-        expect(evts['event-2'][2]).toBe(cb2);
+        expect(_.contains(evts['event-2'], cb2)).toBe(true);
+        expect(_.contains(evts['event-2'], cb4)).toBe(true);
+        expect(_.count(evts['event-2'], cb2)).toBe(2);
       });
 
       it('should remove an array of callbacks for a specified event name', function() {
@@ -207,24 +221,24 @@ describe('Observable Mixin', function() {
         o2.off('event-1', [cb2, cb3, cb5]);
         evts = o2.getEvents();
         expect(evts['event-1'].length).toBe(2);
-        expect(evts['event-1'][0]).toBe(cb1);
-        expect(evts['event-1'][1]).toBe(cb4);
+        expect(_.contains(evts['event-1'], cb1)).toBe(true);
+        expect(_.contains(evts['event-1'], cb4)).toBe(true);
 
         o2.on('event-2', cb1, cb2, cb3);
         expect(evts['event-2'].length).toBe(8);
         o2.off('event-2', [cb5, cb3, cb1]);
         expect(evts['event-2'].length).toBe(3);
-        expect(evts['event-2'][0]).toBe(cb2);
-        expect(evts['event-2'][1]).toBe(cb4);
-        expect(evts['event-2'][2]).toBe(cb2);
+        expect(_.contains(evts['event-2'], cb2)).toBe(true);
+        expect(_.contains(evts['event-2'], cb4)).toBe(true);
+        expect(_.count(evts['event-2'], cb2)).toBe(2);
       });
 
-      it('should delete an event entirely if only the event name is passed', function() {
+      it('should remove all callbacks for an event if only an event name is passed', function() {
         var evts = o2.getEvents();
         expect(evts['event-1'].length).toBe(5);
         o2.off('event-1');
         evts = o2.getEvents();
-        expect(evts['event-1']).not.toBeDefined();
+        expect(evts['event-1'].length).toBe(0);
         expect(evts['event-2']).toBeDefined();
         expect(evts['event-2'].length).toBe(5);
       });
@@ -321,9 +335,12 @@ describe('Observable Mixin', function() {
         expect(evts['event-1']).toBeDefined();
         expect(evts['event-2']).toBeDefined();
 
-        expect(evts['event-1'][0]).toBe(cb1);
-        expect(evts['event-2'][0]).toBe(cb2);
-        expect(evts['event-2'][1]).toBe(cb3);
+        expect(evts['event-1'].length).toBe(1);
+        expect(_.contains(evts['event-1'], cb1)).toBe(true);
+
+        expect(evts['event-2'].length).toBe(2);
+        expect(_.contains(evts['event-2'], cb2)).toBe(true);
+        expect(_.contains(evts['event-2'], cb3)).toBe(true);
       });
     });
   });
