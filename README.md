@@ -1,14 +1,20 @@
 Observable.js
 =============
 
-Mixin function that adds an event system to an object.
+Mixin function that adds observer functionality to an object.
+
+
+[Development](https://raw.github.com/corymartin/observable/master/build/observable.js)
+
+[Production](https://raw.github.com/corymartin/observable/master/build/observable.min.js)
+~500 bytes Minified and Gzipped
 
 
 API
 ===
 
 
-observable(obj [, config])
+observable( [obj] )
 --------------------------
 
 Adds observer functions to the target object.
@@ -16,10 +22,7 @@ Adds observer functions to the target object.
 __Parameters__
 
 - __*obj*__ `Object` Target object to receive observer functions.
-- __*config*__ `Object` Optional settings.
-  - __*on*__ `String` Name of the on/bind/subscribe function. Default is *on*
-  - __*off*__ `String` Name of the off/unbind/unsubscribe function. Default is *off*
-  - __*fire*__ `String` Name of the fire/trigger/publish function. Default is *fire*
+  If not passed, a new object will be created and returned.
 
 __Returns__
 `Object` The target object.
@@ -27,39 +30,33 @@ __Returns__
 Applied to an existing object
 
 ```js
-var myObj = { /*...*/ }
-observable(myObj);
+var myobj = { /*...*/ };
+observable(myobj);
 ```
 ```js
-var myObj = new MyCtor;
-observable(myObj);
+var myobj = new Widget;
+observable(myobj);
 ```
 
 Used to initialize an object
 
 ```js
-var myObj = observable({
-  /*...*/
-});
+var myobj = observable({ /*...*/ });
 ```
 
-Using the config options to change the name of the observable functions
+Used to create a new object
 
 ```js
-var myObj = { /*...*/ }
-observable(myObj, {
-  on   : 'bind',
-  off  : 'unbind',
-  fire : 'trigger'
-});
+var myobj = observable();
 ```
 
 With a function constructor - each instance will have it's own events collection
 
 ```
-function MyCtor() {};
-observable(MyCtor.prototype);
-var myObj = new MyCtor;
+function Widget() {};
+observable(Widget.prototype);
+
+var myobj = new Widget;
 ```
 
 
@@ -71,8 +68,7 @@ Four functions are added to the target object:
 
 
 <a name="on"></a>
-on(eventName, callback [, callbackN])
-on(eventName, callbackArray)
+on(eventName, callback [, callbackN]) <br /> on(eventName, callbackArray)
 -------------------------------------
 
 Binds one or more callbacks to `eventName`
@@ -80,39 +76,60 @@ Binds one or more callbacks to `eventName`
 __Parameters__
 
 - __*eventName*__ `String` Event identifier.
-- __*callback*__ `Function` One or more callback functions (comma separated) to bind.
+- __*callback*__ `Function | Array` Either one or more callback functions
+  (comma separated) to bind or an array thereof.
 
 __Returns__
 `Object` The target object.
 
 ```js
-myObj.on('widgetLoaded', function(){ /*...*/ });
+myobj.on('widgetLoaded', function(){
+  /*...*/
+});
+```
+```js
+function init(){};
+function populate(){};
+```
+```js
+myobj.on('widgetLoaded', init, populate);
+```
+```js
+myobj.on('widgetLoaded', [init, populate]);
 ```
 
 
 <a name="off"></a>
-off(eventName, callback [, callbackN])
+off(eventName, callback [, callbackN]) <br /> off(eventName, callbackArray)
 --------------------------------------
 
-Unbinds one or more callbacks bound to `eventName`
+Removes one or more callbacks bound to `eventName`
 
 __Parameters__
 
 - __*eventName*__ `String` Event identifier.
-- __*callback*__ `Function` One or more callback function references (comma separated) to unbind.
+- __*callback*__ `Function` One or more callback function references
+  (comma separated) to unbind or an array thereof.
 
 __Returns__
 `Object` The target object.
 
 ```js
-myObj.off('widgetLoaded', myCallback); // Unbinds callback `myCallback`
+function init(){};
+function populate(){};
+```
+```js
+myobj.off('widgetLoaded', init, populate);
+```
+```js
+myobj.off('widgetLoaded', [init, populate]);
 ```
 
 
 off(eventName)
 --------------
 
-Removes all callbacks for `eventName`
+Removes all callbacks bound to `eventName`
 
 __Parameters__
 
@@ -122,7 +139,7 @@ __Returns__
 `Object` The target object.
 
 ```js
-myObj.off('widgetLoaded'); // Removes event "widgetLoaded"
+myobj.off('widgetLoaded');
 ```
 
 
@@ -135,7 +152,7 @@ __Returns__
 `Object` The target object.
 
 ```js
-myObj.off(); // myObj now has no events
+myobj.off();
 ```
 
 
@@ -154,10 +171,10 @@ __Returns__
 `Object` The target object.
 
 ```js
-myObj.fire('widgetLoaded');
+myobj.fire('widgetLoaded');
 ```
 ```js
-myObj.fire('widgetLoaded', 'some', 'args', 4, 'you');
+myobj.fire('widgetLoaded', 'some', /args/, 4, 'you');
 ```
 
 
@@ -171,7 +188,7 @@ __Returns__
 `Object` The events collection.
 
 ```js
-myObj.getEvents(); //=> { widgetLoaded: [/*functions*/], widgetError: [/*...*/] }
+myobj.getEvents();
 ```
 
 
@@ -180,66 +197,82 @@ Extended Examples
 
 ```js
 var widget = observable({
-  name: 'widgie',
+  title: 'widgie',
   render: function(){}
 });
 
-//
-// Bind some functions to an event.
-//
-widget.on('showError', function() {
-  // do something error related
+/*
+ * Bind some functions to an event.
+ */
+widget.on('widget:update', function() {
+  /*...*/
 });
 
-var highlightInputElement = function() { /*...*/ }
-var recordError           = function() { /*...*/ }
+var highlightChange = function() { /*...*/ }
+var save            = function() { /*...*/ }
 
-myObj.on('showError', highlightInputElement, recordError);
+myobj.on('widget:update', highlightChange, save);
 
-//
-// Invoke the callbacks bound to 'showError'
-//
-myObj.fire('showError');
+/*
+ * Fire the 'widget:update' event
+ */
+myobj.fire('widget:update');
 
-//
-// Unbind a callback
-//
-myObj.off('showError', recordError);
+/*
+ * Unbind the 'save' handler for the 'widget:update' event
+ */
+myobj.off('showError', save);
 ```
 
-Custom event
+### Custom event
 
 ```js
 function Widget() {
-  this.name = 'widgie';
+  /*...*/
 };
 observable(Widget.prototype);
 
-Widget.prototype.onShowError = function() {
-  [].unshift.call(arguments, 'widget:error');
-  this.on.apply(this, arguments);
+Widget.prototype.onError = function() {
+  var callbacks = [].slice.call(arguments);
+  this.on('widget:error', callbacks);
   return this;
-}
+};
 
-Widget.prototype.showError = function(msg) {
+Widget.prototype.error = function(msg) {
   this.fire('widget:error', msg);
-}
-
-/* ... */
+};
 
 var w = new Widget;
 
-w.onShowError(
-  function(msg) {
-    console.log('1 ' + msg);
-  },
-  function(msg) {
-    console.log('2 ' + msg);
-  }
+w.onError(
+  function(msg) { /* Update UI */ },
+  function(msg) { /* Log error */ }
 );
 
-w.showError('Oh No!');
-//=> 1 Oh No!
-//=> 2 Oh No!
+w.showError('Something went wrong.');
 ```
 
+### PubSub
+
+```js
+var pubsub = observable();
+
+var todosInputWidget = {
+  /*...*/
+  saveTodo : function(todoData) {
+    acme.pubsub.fire('todos:new', todoData);
+  }
+  /*...*/
+};
+
+var todosDisplayWidget = {
+  /*...*/
+  init : function(){
+    acme.pubsub.on('todos:new', this.showTodo);
+  },
+  showTodo : function(todoData) {
+    // Display new todo
+  }
+  /*...*/
+};
+```
