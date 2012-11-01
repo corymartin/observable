@@ -190,19 +190,19 @@ Extended Examples
 
 ```js
 var widget = observable({
-  title: 'widgie',
+  title:  'Blerg',
   render: function(){}
 });
 
 /*
- * Bind some functions to an event.
+ * Bind some callbacks to an event.
  */
 widget.on('widget:update', function() {
   /*...*/
 });
 
-var highlightChange = function() { /*...*/ }
-var save            = function() { /*...*/ }
+var highlightChange = function() { /*...*/ };
+var save            = function() { /*...*/ };
 
 myobj.on('widget:update', highlightChange, save);
 
@@ -214,7 +214,7 @@ myobj.fire('widget:update');
 /*
  * Unbind the 'save' handler for the 'widget:update' event
  */
-myobj.off('showError', save);
+myobj.off('widget:update', save);
 ```
 
 ### Custom event
