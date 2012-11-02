@@ -1,7 +1,7 @@
 /*!
  * Observable Mixin
  * ================
- * v0.2.0
+ * v0.2.1
  * Adds basic observer pattern functionality to an object.
  * https://github.com/corymartin/observable
  * Copyright (c) 2012 Cory Martin
@@ -54,13 +54,14 @@
       // Lazy init events collection
       if (!this._events) this._events = {};
 
-      var handlers  = this._events[evt] = this._events[evt] || [];
-      var functions = _isArray(callbacks)
+      var handlers = this._events[evt] = this._events[evt] || [];
+
+      callbacks = _isArray(callbacks)
         ? callbacks
         : _slice.call(arguments, 1);
 
-      _each(functions, function(fn) {
-        handlers.push(fn);
+      _each(callbacks, function(cb) {
+        handlers.push(cb);
       });
 
       return this;
@@ -75,7 +76,7 @@
      *    // Delete specific event.
      *    myObj.off( 'showErrors' )
      *
-     *    // Unbind specific handlers
+     *    // Unbind specific callbacks.
      *    myObj.off( 'showErrors', function1, functionN )
      *    myObj.off( 'showErrors', [function1, functionN] )
      *
@@ -96,13 +97,15 @@
         return this;
       }
 
-      var functions = _isArray(callbacks)
+      var handlers = this._events[evt];
+      if (!handlers || !handlers.length) return this;
+
+      callbacks = _isArray(callbacks)
         ? callbacks
         : _slice.call(arguments, 1);
-      var handlers = this._events[evt];
 
-      _each(functions, function(fn) {
-        _each(handlers, function(cb, i) {
+      _each(callbacks, function(cb) {
+        _each(handlers, function(fn, i) {
           if (fn === cb) handlers.splice(i, 1);
         });
       });
@@ -125,21 +128,24 @@
      * @api public
      */
     fire : function fire(evt) {
-      if (!this._events || !this._events[evt]) return this;
+      if (!this._events) return this;
+
+      var handlers = this._events[evt];
+      if (!handlers || !handlers.length) return this;
 
       var args = arguments.length > 1
         ? _slice.call(arguments, 1)
         : [];
 
-      _each(this._events[evt], function(cb) {
-        cb.apply(this, args)
+      _each(handlers, function(fn) {
+        fn.apply(this, args);
       }, this);
 
       return this;
     },
 
     /**
-     * @returns {Object|Array} Copy of the events collection, or an array of callbacks for a particular event..
+     * @returns {Object|Array} Copy of the events collection, or an array of handlers for a particular event..
      * @api public
      */
     getEvents : function getEvents() {
@@ -158,7 +164,7 @@
   };
 
 
-  observable.VERSION = '0.2.0';
+  observable.VERSION = '0.2.1';
 
 
   /*
