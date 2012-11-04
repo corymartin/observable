@@ -320,6 +320,38 @@ describe('Observable Mixin', function() {
       });
     });
 
+    describe('#fire context', function() {
+      var pubsub, obj, tester;
+
+      beforeEach(function() {
+        pubsub = observable();
+        obj = observable({
+          trigger : function() {
+            this.fire('test:new', 'obj');
+            pubsub.fire('test:new', 'pubsub');
+          }
+        });
+        tester = {
+          testObj : function(cb) {
+            obj.on('test:new', cb);
+          },
+          testPubsub : function(cb) {
+            pubsub.on('test:new', cb);
+          }
+        };
+      });
+
+      it('should use the observable object as `this`', function() {
+        tester.testObj(function() {
+          expect(this).toBe(obj);
+        });
+        tester.testPubsub(function() {
+          expect(this).toBe(pubsub);
+        });
+        obj.trigger();
+      });
+    });
+
     describe('#getEvents', function() {
       it('should return a copy of the events collection', function() {
         o2.on('event-1', cb1);
