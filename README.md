@@ -191,7 +191,7 @@ myobj.getEvents();
 ```js
 var myobservable = observable.noConflict();
 
-// Former `observable` has no been restored.
+// Former `observable` has now been restored.
 ```
 
 
