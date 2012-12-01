@@ -67,7 +67,7 @@ Four functions are added to the target object:
 
 
 <a name="on"></a>
-### on( eventName, callback [, callbackN] ) <br /> on( eventName, callbackArray )
+### #on( eventName, callback [, callbackN] ) <br /> #on( eventName, callbackArray )
 
 Binds one or more callbacks to `eventName`
 
@@ -98,7 +98,7 @@ myobj.on('widgetLoaded', [init, populate]);
 
 
 <a name="off"></a>
-### off( eventName, callback [, callbackN] ) <br /> off( eventName, callbackArray )
+### #off( eventName, callback [, callbackN] ) <br /> #off( eventName, callbackArray )
 
 Removes one or more callbacks bound to `eventName`
 
@@ -123,7 +123,7 @@ myobj.off('widgetLoaded', [init, populate]);
 ```
 
 
-### off( eventName )
+### #off( eventName )
 
 Removes all callbacks bound to `eventName`
 
@@ -139,7 +139,7 @@ myobj.off('widgetLoaded');
 ```
 
 
-### off()
+### #off()
 
 Removes all events.
 
@@ -152,7 +152,7 @@ myobj.off();
 
 
 <a name="fire"></a>
-### fire( eventName [, args] )
+### #fire( eventName [, args] )
 
 Invokes all callbacks for `eventName`
 
@@ -173,7 +173,7 @@ myobj.fire('widgetLoaded', 'some', /args/, 4, 'you');
 
 
 <a name="getEvents"></a>
-### getEvents()
+### #getEvents()
 
 Returns a copy of the events collection.
 
@@ -182,6 +182,16 @@ __Returns__
 
 ```js
 myobj.getEvents();
+```
+
+
+<a name="noConflict"></a>
+### observable.noConflict()
+
+```js
+var myobservable = observable.noConflict();
+
+// Former `observable` has no been restored.
 ```
 
 

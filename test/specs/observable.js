@@ -122,7 +122,7 @@ describe('Observable Mixin', function() {
 
 
   describe('functions', function() {
-    var result = [];
+    var result;
     var cb1 = function() { result.push('cb1'); }
     var cb2 = function() { result.push('cb2'); }
     var cb3 = function() { result.push('cb3'); }
@@ -130,6 +130,7 @@ describe('Observable Mixin', function() {
     var cb5 = function() { result.push('cb5'); }
 
     beforeEach(function() {
+      result = [];
       observable(o1);
     });
 
@@ -374,6 +375,22 @@ describe('Observable Mixin', function() {
         expect(_.contains(evts['event-2'], cb2)).toBe(true);
         expect(_.contains(evts['event-2'], cb3)).toBe(true);
       });
+    });
+  });
+
+  describe('observable.noConflict()', function() {
+    it('should restore the original `observable` and return a reference to this one', function() {
+      var original = observable;
+
+      expect(typeof observable.noConflict).toBe('function');
+      var obs2 = observable.noConflict();
+      expect(window.observable).toBe(undefined); // No prior def here
+      expect(obs2).toBe(original);
+      expect(observable).toBe(undefined);
+
+      // Reset
+      observable = obs2.noConflict();
+      expect(observable).toBe(original);
     });
   });
 
