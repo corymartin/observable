@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Observable.js Performance Tests/Observations</title>
+</head>
+<body>
+  <script src="../lib/observable.js"></script>
+  <script>
+  void function() {
+    var obs;
+
+    var beforeEach = function() {
+      obs = observable();
+    };
+
+    var test = function(name, callback) {
+      beforeEach();
+      var cnt = 1000000;
+      console.time(name);
+      while (cnt--) {
+        callback();
+      }
+      console.timeEnd(name);
+    };
+
+    // #on
+    test('#on() add multiple callbacks', function() {
+      obs.on('test', function(){});
+    });
+  }();
+  </script>
+</body>
+</html>
