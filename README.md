@@ -5,9 +5,9 @@ Mixin function that adds observer functionality to an object.
 
 Download
 --------
-[Development](https://raw.github.com/corymartin/observable/master/build/observable.js)
+[Development](https://raw.github.com/corymartin/observable/0.3.1/build/observable.js)
 
-[Production](https://raw.github.com/corymartin/observable/master/build/observable.min.js)
+[Production](https://raw.github.com/corymartin/observable/0.3.1/build/observable.min.js)
 ~500 bytes Minified and Gzipped
 
 
