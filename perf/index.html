@@ -48,6 +48,11 @@
     test('#off() remove array of callbacks', function() {
       obs.off('test', [function(){}, function(){}, function(){}]);
     });
+
+    // #fire
+    test('#fire() invoke event with arguments', function() {
+      obs.fire('test', 'uno', 'dos', 'tres', 4, /cinco/);
+    });
   }();
   </script>
 </body>
