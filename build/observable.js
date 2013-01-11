@@ -13,11 +13,23 @@
   var root = this;
   var previousObservable = root.observable;
 
+
+  /**
+   * @param {Object} obj Target object to receive observable functions. Passed by reference.
+   * @returns {Object}
+   * @api public
+   */
+  function observable(obj) {
+    return _extend(obj || {}, _observable);
+  };
+
+
+  observable.VERSION = '0.3.1';
+
+
   /*
    * Utils
    */
-  var _slice = [].slice;
-
   var _extend = function(target, source) {
     if (source != null) {
       for (var key in source) {
@@ -27,18 +39,13 @@
     return target;
   };
 
-  var _each = function(array, iterator, context) {
-    for (var i = 0; i < array.length; i++) {
-      iterator.call(context, array[i], i);
+  var _isArray = Array.isArray || function() {
+    var toString   = Object.prototype.toString;
+    var arrayClass = '[object Array]';
+    return function(obj) {
+      return toString.call(obj) === arrayClass;
     }
-  };
-
-  var _toString   = ({}).toString;
-  var _arrayClass = '[object Array]';
-
-  var _isArray = Array.isArray || function(obj) {
-    return _toString.call(obj) === _arrayClass;
-  };
+  }();
 
 
   var _observable = {
@@ -59,14 +66,15 @@
 
       var handlers = this._events[evt] = this._events[evt] || [];
 
-      callbacks = _isArray(callbacks)
-        ? callbacks
-        : _slice.call(arguments, 1);
+      var i = 0;
+      if (! _isArray(callbacks)) {
+        i = 1;
+        callbacks = arguments;
+      }
 
-      _each(callbacks, function(cb) {
-        handlers.push(cb);
-      });
-
+      for (; i < callbacks.length; i++) {
+        handlers.push(callbacks[i]);
+      }
       return this;
     },
 
@@ -92,10 +100,12 @@
       if (!this._events) return this;
 
       if (evt == null) {
+        // Remove all events.
         this._events = {};
         return this;
       }
       if (arguments.length === 1) {
+        // Remove specific event.
         this._events[evt] = [];
         return this;
       }
@@ -103,16 +113,18 @@
       var handlers = this._events[evt];
       if (!handlers || !handlers.length) return this;
 
-      callbacks = _isArray(callbacks)
-        ? callbacks
-        : _slice.call(arguments, 1);
+      var i = 0;
+      if (! _isArray(callbacks)) {
+        i = 1;
+        callbacks = arguments;
+      }
 
-      _each(callbacks, function(cb) {
-        _each(handlers, function(fn, i) {
-          if (fn === cb) handlers.splice(i, 1);
-        });
-      });
-
+      for (; i < callbacks.length; i++) {
+        var cb = callbacks[i];
+        for (var idx = 0; idx < handlers.length; idx++) {
+          if (handlers[idx] === cb) handlers.splice(idx, 1);
+        }
+      }
       return this;
     },
 
@@ -136,13 +148,14 @@
       var handlers = this._events[evt];
       if (!handlers || !handlers.length) return this;
 
-      var args = arguments.length > 1
-        ? _slice.call(arguments, 1)
-        : [];
+      var args = [];
+      for (var i = 1; i < arguments.length; i++) {
+        args.push(arguments[i]);
+      }
 
-      _each(handlers, function(fn) {
-        fn.apply(this, args);
-      }, this);
+      for (var i = 0; i < handlers.length; i++) {
+        handlers[i].apply(this, args);
+      }
 
       return this;
     },
@@ -158,28 +171,6 @@
 
 
   /**
-   * @param {Object} obj Target object to receive observable functions. Passed by reference.
-   * @returns {Object}
-   * @api public
-   */
-  function observable(obj) {
-    return _extend(obj || {}, _observable);
-  };
-
-
-  observable.VERSION = '0.3.0';
-
-
-  /*
-   * Export
-   */
-  if (typeof module !== 'undefined' && module.exports)
-    module.exports = observable;
-  else
-    root.observable = observable;
-
-
-  /**
    * @returns {Function}
    * @api public
    */
@@ -187,5 +178,24 @@
     root.observable = previousObservable;
     return observable;
   };
+
+
+  /*
+   * Export
+   */
+  // CommonJS/Node
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = observable;
+  }
+  // Browser
+  else {
+    root.observable = observable;
+  }
+  // AMD/Require.js
+  if (typeof define === 'function' && define.amd) {
+    define(function() {
+      return observable;
+    });
+  }
 
 }).call(this);
