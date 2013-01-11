@@ -12,6 +12,9 @@
 
     var beforeEach = function() {
       obs = observable();
+      for (var i = 50; i--;) {
+        obs.on('test', function(){});
+      }
     };
 
     var test = function(name, callback) {
@@ -33,6 +36,17 @@
     });
     test('#on() add array of callbacks', function() {
       obs.on('test', [function(){}, function(){}, function(){}]);
+    });
+
+    // #off
+    test('#off() remove single callback', function() {
+      obs.off('test', function(){});
+    });
+    test('#off() remove multiple callbacks', function() {
+      obs.off('test', function(){}, function(){}, function(){});
+    });
+    test('#off() remove array of callbacks', function() {
+      obs.off('test', [function(){}, function(){}, function(){}]);
     });
   }();
   </script>
