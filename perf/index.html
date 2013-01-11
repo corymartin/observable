@@ -16,7 +16,7 @@
 
     var test = function(name, callback) {
       beforeEach();
-      var cnt = 1000000;
+      var cnt = 500000;
       console.time(name);
       while (cnt--) {
         callback();
@@ -25,8 +25,14 @@
     };
 
     // #on
-    test('#on() add multiple callbacks', function() {
+    test('#on() add single callback', function() {
       obs.on('test', function(){});
+    });
+    test('#on() add multiple callbacks', function() {
+      obs.on('test', function(){}, function(){}, function(){});
+    });
+    test('#on() add array of callbacks', function() {
+      obs.on('test', [function(){}, function(){}, function(){}]);
     });
   }();
   </script>
