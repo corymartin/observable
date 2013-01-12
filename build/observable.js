@@ -20,17 +20,19 @@
    * @api public
    */
   function observable(obj) {
-    return _extend(obj || {}, _observable);
+    return extend(obj || {}, _observable);
   };
 
 
-  observable.VERSION = '0.3.1';
+  observable.VERSION = '0.3.2';
 
 
   /*
    * Utils
    */
-  var _extend = function(target, source) {
+  var slice = Array.prototype.slice;
+
+  var extend = function(target, source) {
     if (source != null) {
       for (var key in source) {
         target[key] = source[key];
@@ -39,7 +41,7 @@
     return target;
   };
 
-  var _isArray = Array.isArray || function() {
+  var isArray = Array.isArray || function() {
     var toString   = Object.prototype.toString;
     var arrayClass = '[object Array]';
     return function(obj) {
@@ -66,13 +68,13 @@
 
       var handlers = this._events[evt] = this._events[evt] || [];
 
-      var i = 0;
-      if (! _isArray(callbacks)) {
-        i = 1;
-        callbacks = arguments;
+      if (! isArray(callbacks)) {
+        callbacks = arguments.length === 2
+          ? [callbacks]
+          : slice.call(arguments, 1);
       }
 
-      for (; i < callbacks.length; i++) {
+      for (var i = 0; i < callbacks.length; i++) {
         handlers.push(callbacks[i]);
       }
       return this;
@@ -113,13 +115,13 @@
       var handlers = this._events[evt];
       if (!handlers || !handlers.length) return this;
 
-      var i = 0;
-      if (! _isArray(callbacks)) {
-        i = 1;
-        callbacks = arguments;
+      if (! isArray(callbacks)) {
+        callbacks = arguments.length === 2
+          ? [callbacks]
+          : slice.call(arguments, 1);
       }
 
-      for (; i < callbacks.length; i++) {
+      for (var i = 0; i < callbacks.length; i++) {
         var cb = callbacks[i];
         for (var idx = 0; idx < handlers.length; idx++) {
           if (handlers[idx] === cb) handlers.splice(idx, 1);
@@ -165,7 +167,7 @@
      * @api public
      */
     getEvents : function getEvents() {
-      return _extend({}, this._events);
+      return extend({}, this._events);
     }
   };
 
