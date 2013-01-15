@@ -182,10 +182,6 @@ describe('Observable Mixin', function() {
         expect(x).toBe(o2);
         x = o2.on('event-1', cb1);
         expect(x).toBe(o2);
-        x = o2.on('event-1');
-        expect(x).toBe(o2);
-        x = o2.on();
-        expect(x).toBe(o2);
       });
     });
 
