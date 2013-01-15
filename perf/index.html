@@ -7,17 +7,16 @@
 <body>
   <script src="../lib/observable.js"></script>
   <script>
-  void function() {
     var obs;
 
-    var beforeEach = function() {
+    function beforeEach() {
       obs = observable();
       for (var i = 50; i--;) {
         obs.on('test', function(){});
       }
     };
 
-    var test = function(name, callback) {
+    function test(name, callback) {
       beforeEach();
       var cnt = 500000;
       console.time(name);
@@ -28,32 +27,31 @@
     };
 
     // #on
-    test('#on() add single callback', function() {
+    test('#on() add single callback', function onSingle() {
       obs.on('test', function(){});
     });
-    test('#on() add multiple callbacks', function() {
+    test('#on() add multiple callbacks', function onMultiple() {
       obs.on('test', function(){}, function(){}, function(){});
     });
-    test('#on() add array of callbacks', function() {
+    test('#on() add array of callbacks', function onArray() {
       obs.on('test', [function(){}, function(){}, function(){}]);
     });
 
     // #off
-    test('#off() remove single callback', function() {
+    test('#off() remove single callback', function offSingle() {
       obs.off('test', function(){});
     });
-    test('#off() remove multiple callbacks', function() {
+    test('#off() remove multiple callbacks', function offMultiple() {
       obs.off('test', function(){}, function(){}, function(){});
     });
-    test('#off() remove array of callbacks', function() {
+    test('#off() remove array of callbacks', function offArray() {
       obs.off('test', [function(){}, function(){}, function(){}]);
     });
 
     // #fire
-    test('#fire() invoke event with arguments', function() {
+    test('#fire() invoke event with arguments', function fireArguments() {
       obs.fire('test', 'uno', 'dos', 'tres', 4, /cinco/);
     });
-  }();
   </script>
 </body>
 </html>
