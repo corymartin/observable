@@ -27,29 +27,42 @@
   observable.VERSION = '0.3.2';
 
 
-  /*
-   * Utils
+  /**
+   * @param {Object} target
+   * @param {Object} source
+   * @returns {Object}
+   * @api private
    */
-  var slice = Array.prototype.slice;
-
   var extend = function(target, source) {
-    if (source != null) {
-      for (var key in source) {
-        target[key] = source[key];
-      }
+    if (! source) return target;
+    for (var key in source) {
+      target[key] = source[key];
     }
     return target;
   };
 
-  var isArray = Array.isArray || function() {
-    var toString   = Object.prototype.toString;
-    var arrayClass = '[object Array]';
-    return function(obj) {
-      return toString.call(obj) === arrayClass;
+
+  /**
+   * Cuz Array#slice.call() is slooow.
+   *
+   * @param {Object} obj Array like object.
+   * @param {Number} index
+   * @returns {Array}
+   * @api private
+   */
+  var slice = function(obj, index) {
+    var arr = [];
+    index <<= 0;
+    for (; index < obj.length; index++) {
+      arr.push(obj[index]);
     }
-  }();
+    return arr;
+  };
 
 
+  /*
+   * Observable functions
+   */
   var _observable = {
     /**
      * On (aka Subscribe/Bind)
@@ -64,16 +77,12 @@
      */
     on : function on(evt, callbacks) {
       // Lazy init events collection
-      if (!this._events) this._events = {};
-
+      if (! this._events) this._events = {};
       var handlers = this._events[evt] = this._events[evt] || [];
 
-      if (! isArray(callbacks)) {
-        callbacks = arguments.length === 2
-          ? [callbacks]
-          : slice.call(arguments, 1);
+      if (typeof callbacks === 'function') {
+        callbacks = slice(arguments, 1);
       }
-
       for (var i = 0; i < callbacks.length; i++) {
         handlers.push(callbacks[i]);
       }
@@ -99,35 +108,33 @@
      * @api public
      */
     off : function off(evt, callbacks) {
-      if (!this._events) return this;
+      if (! this._events) return this;
 
-      if (evt == null) {
+      switch(arguments.length) {
         // Remove all events.
-        this._events = {};
-        return this;
-      }
-      if (arguments.length === 1) {
+        case 0:
+          this._events = {};
+          return this;
         // Remove specific event.
-        this._events[evt] = [];
-        return this;
-      }
+        case 1:
+          this._events[evt] = [];
+          return this;
+        // Remove specific handlers from an event.
+        default:
+          var handlers = this._events[evt];
+          if (! handlers || ! handlers.length) return this;
 
-      var handlers = this._events[evt];
-      if (!handlers || !handlers.length) return this;
-
-      if (! isArray(callbacks)) {
-        callbacks = arguments.length === 2
-          ? [callbacks]
-          : slice.call(arguments, 1);
+          if (typeof callbacks === 'function') {
+            callbacks = slice(arguments, 1);
+          }
+          for (var i = 0; i < callbacks.length; i++) {
+            var cb = callbacks[i];
+            for (var idx = 0; idx < handlers.length; idx++) {
+              if (handlers[idx] === cb) handlers.splice(idx, 1);
+            }
+          }
+          return this;
       }
-
-      for (var i = 0; i < callbacks.length; i++) {
-        var cb = callbacks[i];
-        for (var idx = 0; idx < handlers.length; idx++) {
-          if (handlers[idx] === cb) handlers.splice(idx, 1);
-        }
-      }
-      return this;
     },
 
     /**
@@ -145,20 +152,18 @@
      * @api public
      */
     fire : function fire(evt) {
-      if (!this._events) return this;
+      if (! this._events) return this;
 
       var handlers = this._events[evt];
-      if (!handlers || !handlers.length) return this;
+      if (! handlers || ! handlers.length) return this;
 
-      var args = [];
-      for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i]);
-      }
-
+      var args = slice(arguments, 1);
+      var call = ! args.length;
       for (var i = 0; i < handlers.length; i++) {
-        handlers[i].apply(this, args);
+        call
+          ? handlers[i].call(this)
+          : handlers[i].apply(this, args);
       }
-
       return this;
     },
 
@@ -189,15 +194,15 @@
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = observable;
   }
-  // Browser
-  else {
-    root.observable = observable;
-  }
   // AMD/Require.js
-  if (typeof define === 'function' && define.amd) {
+  else if (typeof define === 'function' && define.amd) {
     define(function() {
       return observable;
     });
+  }
+  // Browser
+  else {
+    root.observable = observable;
   }
 
 }).call(this);

@@ -49,8 +49,11 @@
     });
 
     // #fire
-    test('#fire() invoke event with arguments', function fireArguments() {
-      obs.fire('test', 'uno', 'dos', 'tres', 4, /cinco/);
+    test('#fire() invoke event', function fireNoArguments() {
+      obs.fire('test');
+    });
+    test('#fire() invoke event with arguments', function fireWithArguments() {
+      obs.fire('test', 'uno', /dos/, 3);
     });
   </script>
 </body>
