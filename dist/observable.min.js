@@ -1,7 +1,6 @@
 /*!
  * @preserve
  * Observable Mixin
- * v0.3.0
  * Adds basic observer pattern functionality to an object.
  * https://github.com/corymartin/observable
  * Copyright (c) 2012 Cory Martin
