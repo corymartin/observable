@@ -24,7 +24,7 @@
   };
 
 
-  observable.VERSION = '0.3.2';
+  observable.VERSION = '0.3.3';
 
 
   /**
@@ -39,24 +39,6 @@
       target[key] = source[key];
     }
     return target;
-  };
-
-
-  /**
-   * Cuz Array#slice.call() is slooow.
-   *
-   * @param {Object} obj Array like object.
-   * @param {Number} index
-   * @returns {Array}
-   * @api private
-   */
-  var slice = function(obj, index) {
-    var arr = [];
-    index <<= 0;
-    for (; index < obj.length; index++) {
-      arr.push(obj[index]);
-    }
-    return arr;
   };
 
 
@@ -81,7 +63,7 @@
       var handlers = this._events[evt] = this._events[evt] || [];
 
       if (typeof callbacks === 'function') {
-        callbacks = slice(arguments, 1);
+        callbacks = Array.apply(null, arguments).slice(1);
       }
       for (var i = 0; i < callbacks.length; i++) {
         handlers.push(callbacks[i]);
@@ -125,7 +107,7 @@
           if (! handlers || ! handlers.length) return this;
 
           if (typeof callbacks === 'function') {
-            callbacks = slice(arguments, 1);
+            callbacks = Array.apply(null, arguments).slice(1);
           }
           for (var i = 0; i < callbacks.length; i++) {
             var cb = callbacks[i];
@@ -151,22 +133,24 @@
      * @returns {Object} Reference to `this` for chaining.
      * @api public
      */
-    fire : function fire(evt) {
+    fire : function fire(evt, a, b, c) {
       if (! this._events) return this;
 
       var handlers = this._events[evt];
-      if (! handlers) return this;
+      if (! handlers || ! handlers.length) return this;
 
-      var args = arguments;
-      for (var i = 0; i < handlers.length; i++) {
-        // Optimize for most common argument counts.
-        switch(args.length) {
-          case 1:  handlers[i].call(this); break;
-          case 2:  handlers[i].call(this, args[1]); break;
-          case 3:  handlers[i].call(this, args[1], args[2]); break;
-          case 4:  handlers[i].call(this, args[1], args[2], args[3]); break;
-          default: handlers[i].apply(this, slice(args, 1)); break;
-        }
+      var i = -1;
+      var l = handlers.length;
+      // Optimize for most common argument counts. Gleaned from Backbone.js' triggerEvents().
+      switch(arguments.length) {
+        case 1:  while (++i < l) handlers[i].call(this); break;
+        case 2:  while (++i < l) handlers[i].call(this, a); break;
+        case 3:  while (++i < l) handlers[i].call(this, a, b); break;
+        case 4:  while (++i < l) handlers[i].call(this, a, b, c); break;
+        default:
+          var args = Array.apply(null, arguments).slice(1);
+          while (++i < l) handlers[i].apply(this, args);
+          break;
       }
       return this;
     },
