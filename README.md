@@ -5,9 +5,9 @@ Mixin function that adds observer functionality to an object.
 
 Download
 --------
-[Development](https://raw.github.com/corymartin/observable/0.3.2/build/observable.js)
+[Development](https://raw.github.com/corymartin/observable/0.3.3/dist/observable.js)
 
-[Production](https://raw.github.com/corymartin/observable/0.3.2/build/observable.min.js)
+[Production](https://raw.github.com/corymartin/observable/0.3.3/dist/observable.min.js)
 ~500 bytes Minified and Gzipped
 
 
@@ -257,7 +257,7 @@ w.showError('Something went wrong.');
 
 ### PubSub
 
-A working example can be found at [http://jsfiddle.net/QxWt4/1/](http://jsfiddle.net/QxWt4/1/).
+A working example can be found at [http://jsfiddle.net/QxWt4/2/](http://jsfiddle.net/QxWt4/2/).
 
 ```js
 var pubsub = observable();
