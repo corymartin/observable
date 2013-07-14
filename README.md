@@ -257,7 +257,7 @@ w.showError('Something went wrong.');
 
 ### PubSub
 
-A working example can be found at [http://jsfiddle.net/QxWt4/2/](http://jsfiddle.net/QxWt4/2/).
+A working example can be found at [http://jsfiddle.net/QxWt4/3/](http://jsfiddle.net/QxWt4/3/).
 
 ```js
 var pubsub = observable();
