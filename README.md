@@ -252,7 +252,7 @@ w.onError(
   function(msg) { /* Log error */ }
 );
 
-w.showError('Something went wrong.');
+w.error('Something went wrong.');
 ```
 
 ### PubSub
